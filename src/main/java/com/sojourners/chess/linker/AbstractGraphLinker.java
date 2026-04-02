@@ -88,6 +88,12 @@ public abstract class AbstractGraphLinker implements GraphLinker, Runnable {
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
+            // 优先检查是否有再来一局按钮
+            if (checkPlayAgainButton()) {
+                sleep(1000);
+                continue;
+            }
+            
             if (!findBoardPosition()) {
                 sleep(1000);
                 continue;
@@ -97,6 +103,11 @@ public abstract class AbstractGraphLinker implements GraphLinker, Runnable {
                 continue;
             }
             while (!Thread.currentThread().isInterrupted()) {
+                // 优先检查是否有再来一局按钮
+                if (checkPlayAgainButton()) {
+                    break;
+                }
+                
                 sleep(prop.getLinkScanTime());
                 if (!callBack.isThinking() && !pause) {
 
@@ -572,6 +583,10 @@ public abstract class AbstractGraphLinker implements GraphLinker, Runnable {
      * @param y2
      */
     public void autoClick(int x1, int y1, int x2, int y2) {
+        // 检测是否有再来一局按钮
+        if (checkPlayAgainButton()) {
+            return;
+        }
 
         Point p1 = getPosition(x1, y1);
         Point p2 = getPosition(x2, y2);
@@ -581,6 +596,87 @@ public abstract class AbstractGraphLinker implements GraphLinker, Runnable {
             Rectangle windowPos = getTargetWindowPosition();
             mouseClickByFront(windowPos, p1, p2);
         }
+    }
+
+    /**
+     * 检测是否有再来一局按钮并点击
+     * @return 是否点击了再来一局按钮
+     */
+    private boolean checkPlayAgainButton() {
+        try {
+            // 截图
+            BufferedImage img = screenshot(true);
+            // 检测再来一局按钮
+            Point buttonPos = findPlayAgainButton(img);
+            if (buttonPos != null) {
+                // 点击再来一局按钮
+                if (prop.isLinkBackMode()) {
+                    mouseClickByBack(buttonPos, buttonPos);
+                } else {
+                    Rectangle windowPos = getTargetWindowPosition();
+                    mouseClickByFront(windowPos, buttonPos, buttonPos);
+                }
+                // 等待2秒，让新游戏开始
+                Thread.sleep(2000);
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * 寻找再来一局按钮的位置
+     * @param img 屏幕截图
+     * @return 按钮位置，如果没有找到返回null
+     */
+    private Point findPlayAgainButton(BufferedImage img) {
+        // 这里使用简单的颜色检测方法，实际项目中可能需要使用更复杂的图像识别算法
+        // 假设再来一局按钮是黄色的，在屏幕中央偏下位置
+        int width = img.getWidth();
+        int height = img.getHeight();
+        
+        // 搜索区域：屏幕中央偏下
+        int searchX1 = width / 2 - 150;
+        int searchX2 = width / 2 + 150;
+        int searchY1 = height / 2 + 50;
+        int searchY2 = height / 2 + 150;
+        
+        // 黄色的RGB范围
+        int minR = 200, maxR = 255;
+        int minG = 150, maxG = 200;
+        int minB = 50, maxB = 100;
+        
+        // 统计黄色像素的数量
+        int yellowPixelCount = 0;
+        int centerX = 0, centerY = 0;
+        
+        for (int y = searchY1; y < searchY2; y++) {
+            for (int x = searchX1; x < searchX2; x++) {
+                if (x >= 0 && x < width && y >= 0 && y < height) {
+                    int rgb = img.getRGB(x, y);
+                    int r = (rgb >> 16) & 0xFF;
+                    int g = (rgb >> 8) & 0xFF;
+                    int b = rgb & 0xFF;
+                    
+                    if (r >= minR && r <= maxR && g >= minG && g <= maxG && b >= minB && b <= maxB) {
+                        yellowPixelCount++;
+                        centerX += x;
+                        centerY += y;
+                    }
+                }
+            }
+        }
+        
+        // 如果找到足够多的黄色像素，返回中心点
+        if (yellowPixelCount > 1000) {
+            centerX /= yellowPixelCount;
+            centerY /= yellowPixelCount;
+            return new Point(centerX, centerY);
+        }
+        
+        return null;
     }
     private Point getPosition(int x, int y) {
         double pieceWith = boardPos.width / (8 + OnnxModel.PADDING * 2);
