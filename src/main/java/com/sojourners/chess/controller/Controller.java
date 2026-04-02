@@ -40,6 +40,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -157,6 +158,8 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
     private Button linkButton;
     @FXML
     private Button changeTacticButton;
+    @FXML
+    private Button toggleEnginePanelButton;
 
     @FXML
     private TableView<ManualRecord> recordTable;
@@ -609,6 +612,36 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
         doOpenBook();
     }
 
+    private double originalSplitPos = 0.6416122004357299; // 原始分割位置
+    
+    @FXML
+    private void toggleEnginePanelButtonClick(ActionEvent e) {
+        // 获取右侧面板的AnchorPane
+        AnchorPane rightPane = (AnchorPane) splitPane.getItems().get(1);
+        boolean isVisible = rightPane.isVisible();
+        
+        // 切换可见性
+        rightPane.setVisible(!isVisible);
+        
+        // 更新按钮图标和分割面板位置
+        if (isVisible) {
+            // 当前是可见的，点击后隐藏右侧面板
+            toggleEnginePanelButton.setStyle("-fx-background-image: url('/image/arrow-right.png');");
+            // 保存原始分割位置
+            originalSplitPos = splitPane.getDividerPositions()[0];
+            // 设置分割位置为1.0，使左侧面板占满整个窗口
+            splitPane.setDividerPosition(0, 1.0);
+        } else {
+            // 当前是不可见的，点击后显示右侧面板
+            toggleEnginePanelButton.setStyle("-fx-background-image: url('/image/arrow-left.png');");
+            // 恢复原始分割位置
+            splitPane.setDividerPosition(0, originalSplitPos);
+        }
+        
+        // 调整棋盘大小
+        board.autoFitSize(borderPane.getWidth(), borderPane.getHeight(), splitPane.getDividerPositions()[0]);
+    }
+
     @FXML
     private void linkButtonClick(ActionEvent e) {
         if (engine == null) {
@@ -801,6 +834,7 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
         changeTacticButton.setTooltip(new Tooltip("变招"));
         linkButton.setTooltip(new Tooltip("连线"));
         bookSwitchButton.setTooltip(new Tooltip("启用库招"));
+        toggleEnginePanelButton.setTooltip(new Tooltip("显示/隐藏引擎面板"));
 
     }
 
