@@ -43,6 +43,7 @@ public class ThinkData {
         if (score == null) {
             sb.append("绝杀: ");
             score = mate;
+            this.score = mate; // 保存 mate 值到 score 字段
             f = true;
         } else {
             sb.append("分数: ");

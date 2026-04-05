@@ -15,6 +15,8 @@ import com.sojourners.chess.model.ManualRecord;
 import com.sojourners.chess.model.ThinkData;
 import com.sojourners.chess.openbook.OpenBookManager;
 import com.sojourners.chess.util.*;
+import com.sojourners.chess.winrate.WinRateManager;
+import javafx.scene.shape.Rectangle;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -73,6 +75,19 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
     private SplitPane splitPane;
     @FXML
     private SplitPane splitPane2;
+
+    @FXML
+    private SplitPane boardSplitPane;
+    @FXML
+    private AnchorPane winRatePane;
+    @FXML
+    private Rectangle blackWinBar;
+    @FXML
+    private Rectangle redWinBar;
+    @FXML
+    private Label blackPercentLabel;
+    @FXML
+    private Label redPercentLabel;
 
     @FXML
     private ListView<ThinkData> listView;
@@ -700,6 +715,11 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
 
         charPane.setCenter(this.lineChart);
     }
+    
+    private void initWinRate() {
+        // 初始化胜率管理器
+        WinRateManager.getInstance().initialize(blackWinBar, redWinBar, blackPercentLabel, redPercentLabel);
+    }
     public void initialize() {
         // 读取配置
         prop = Properties.getInstance();
@@ -752,6 +772,8 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
         initCanvasDragListener();
         // line chart
         initLineChart();
+        // 胜率显示
+        initWinRate();
         // init chess manual
         chessManualHandle = new ChessManualHandle(chessManualPane, menuOfChessNotation, menuOfShowTactic, notationTree,
                 manualTitleLabel, recordTable, subRecordTable, remarkText,
@@ -1229,6 +1251,12 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
                     if (td.getPv() == 1) {
                         chessManualHandle.setScore(td.getScore(), td.getMate());
                     }
+                    
+                    // 更新胜率显示
+                    if (td.getScore() != null) {
+                        double[] winRates = WinRateManager.getInstance().calculateWinRate(td.getScore());
+                        WinRateManager.getInstance().updateWinRate(winRates[0], winRates[1]);
+                    }
                 });
             }
         }
@@ -1241,6 +1269,16 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
             String move = bd.getMove();
             bd.setWord(board.translate(move, false));
             this.bookTable.getItems().add(bd);
+        }
+
+        // 更新胜率显示
+        if (list != null && !list.isEmpty()) {
+            BookData bestBookData = list.get(0);
+            double winRate = bestBookData.getWinRate();
+            // 胜率值转换为分数，用于计算胜率显示
+            int score = (int) ((winRate - 0.5) * 2000);
+            double[] winRates = WinRateManager.getInstance().calculateWinRate(score);
+            WinRateManager.getInstance().updateWinRate(winRates[0], winRates[1]);
         }
     }
 
