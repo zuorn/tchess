@@ -57,7 +57,12 @@ public class LinkSettingController {
             DialogUtils.showErrorDialog("失败", "输入鼠标走子延迟错误");
             return;
         }
-        prop.setMouseMoveDelay(Integer.parseInt(txt));
+        int mouseMoveDelayValue = Integer.parseInt(txt);
+        if (mouseMoveDelayValue < 200) {
+            DialogUtils.showErrorDialog("失败", "鼠标走子延迟不能小于200毫秒");
+            return;
+        }
+        prop.setMouseMoveDelay(mouseMoveDelayValue);
 
         App.closeLinkSetting();
     }

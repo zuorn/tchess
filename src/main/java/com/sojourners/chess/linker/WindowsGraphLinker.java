@@ -100,7 +100,9 @@ public class WindowsGraphLinker extends AbstractGraphLinker implements MouseList
 
         leftClick(p1.x, p1.y);
         if (Properties.getInstance().getMouseMoveDelay() > 0) {
-            sleep(Properties.getInstance().getMouseMoveDelay());
+            // 生成0到mouseMoveDelay之间的随机数
+            int randomDelay = new java.util.Random().nextInt(Properties.getInstance().getMouseMoveDelay() + 1);
+            sleep(randomDelay);
         }
         leftClick(p2.x, p2.y);
     }

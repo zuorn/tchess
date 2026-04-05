@@ -458,7 +458,11 @@ public abstract class AbstractGraphLinker implements GraphLinker, Runnable {
         robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 
         if (prop.getMouseMoveDelay() > 0) {
-            robot.delay(prop.getMouseMoveDelay());
+            // 生成200毫秒到mouseMoveDelay之间的随机数
+            int moveDelay = prop.getMouseMoveDelay();
+            int minDelay = 200;
+            int randomDelay = minDelay + new java.util.Random().nextInt(moveDelay - minDelay + 1);
+            robot.delay(randomDelay);
         }
         robot.mouseMove(windowPos.x + p2.x, windowPos.y + p2.y);
 
