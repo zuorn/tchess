@@ -91,6 +91,9 @@ public class TimeSettingController {
             return;
         }
         prop.setBookDelayEnd(Integer.parseInt(txt));
+        
+        // 保存配置
+        prop.save();
 
         App.closeTimeSetting();
     }

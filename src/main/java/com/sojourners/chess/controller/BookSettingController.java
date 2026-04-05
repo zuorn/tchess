@@ -75,6 +75,9 @@ public class BookSettingController {
             prop.setMoveRule(MoveRule.FULL_RANDOM);
         }
         prop.setOffManualSteps(Integer.parseInt(offSteps));
+        
+        // 保存配置
+        prop.save();
 
         App.closeBookSetting();
     }

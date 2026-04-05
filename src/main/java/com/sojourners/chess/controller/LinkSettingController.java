@@ -63,6 +63,9 @@ public class LinkSettingController {
             return;
         }
         prop.setMouseMoveDelay(mouseMoveDelayValue);
+        
+        // 保存配置
+        prop.save();
 
         App.closeLinkSetting();
     }
