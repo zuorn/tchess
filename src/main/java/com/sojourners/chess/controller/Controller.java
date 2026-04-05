@@ -149,6 +149,7 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
     @FXML
     private BorderPane charPane;
     private XYChart.Series lineChartSeries;
+    private LineChart<Number, Number> lineChart;
 
     @FXML
     private Button immediateButton;
@@ -496,6 +497,27 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
         } else if (i < newList.size()) {
             oldList.addAll(newList.subList(i, newList.size()));
         }
+        
+        // 动态更新 Y 轴范围
+        if (lineChart != null && !oldList.isEmpty()) {
+            NumberAxis yAxis = (NumberAxis) lineChart.getYAxis();
+            double min = Double.MAX_VALUE;
+            double max = Double.MIN_VALUE;
+            
+            for (XYChart.Data data : oldList) {
+                double value = ((Number) data.getYValue()).doubleValue();
+                if (value < min) min = value;
+                if (value > max) max = value;
+            }
+            
+            // 添加一些边距，使图表更美观
+            double padding = (max - min) * 0.1;
+            if (padding < 100) padding = 100; // 确保最小边距
+            
+            yAxis.setLowerBound(min - padding);
+            yAxis.setUpperBound(max + padding);
+            yAxis.setTickUnit((max - min + padding * 2) / 5); // 5 个刻度
+        }
     }
 
     private void doOpenBook() {
@@ -666,17 +688,17 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
         yAxis.setTickMarkVisible(false);
         yAxis.setMinorTickVisible(false);
 
-        LineChart<Number,Number> lineChart = new LineChart<>(xAxis, yAxis);
-        lineChart.setMinHeight(100);
-        lineChart.setLegendVisible(false);
-        lineChart.setCreateSymbols(false);
-        lineChart.setVerticalGridLinesVisible(false);
-        lineChart.getStylesheets().add(this.getClass().getResource("/style/table.css").toString());
+        this.lineChart = new LineChart<>(xAxis, yAxis);
+        this.lineChart.setMinHeight(100);
+        this.lineChart.setLegendVisible(false);
+        this.lineChart.setCreateSymbols(false);
+        this.lineChart.setVerticalGridLinesVisible(false);
+        this.lineChart.getStylesheets().add(this.getClass().getResource("/style/table.css").toString());
 
         lineChartSeries = new XYChart.Series();
-        lineChart.getData().add(lineChartSeries);
+        this.lineChart.getData().add(lineChartSeries);
 
-        charPane.setCenter(lineChart);
+        charPane.setCenter(this.lineChart);
     }
     public void initialize() {
         // 读取配置
