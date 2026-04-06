@@ -865,8 +865,12 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
     }
 
     public void initStage() {
-        borderPane.setPrefWidth(prop.getStageWidth());
-        borderPane.setPrefHeight(prop.getStageHeight());
+        // 获取舞台（窗口）
+        javafx.stage.Stage stage = (javafx.stage.Stage) borderPane.getScene().getWindow();
+        // 设置舞台大小
+        stage.setWidth(prop.getStageWidth());
+        stage.setHeight(prop.getStageHeight());
+        // 设置分割面板位置
         splitPane.setDividerPosition(0, prop.getSplitPos());
         splitPane2.setDividerPosition(0, prop.getSplitPos2());
 
