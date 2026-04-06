@@ -639,6 +639,8 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
     public void reverseButtonClick(ActionEvent event) {
         isReverse.setValue(!isReverse.getValue());
         board.reverse(isReverse.getValue());
+        // 翻转胜率柱方向
+        WinRateManager.getInstance().setReverse(isReverse.getValue());
     }
 
     @FXML
@@ -867,6 +869,9 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
         borderPane.setPrefHeight(prop.getStageHeight());
         splitPane.setDividerPosition(0, prop.getSplitPos());
         splitPane2.setDividerPosition(0, prop.getSplitPos2());
+
+        // 初始化胜率柱方向
+        WinRateManager.getInstance().setReverse(isReverse.getValue());
 
         // 窗口置顶
         menuOfTopWindow.setSelected(prop.isTopWindow());

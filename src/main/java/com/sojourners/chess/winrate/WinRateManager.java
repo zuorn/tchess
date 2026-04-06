@@ -11,6 +11,7 @@ public class WinRateManager {
     private Rectangle redWinBar;
     private Label blackPercentLabel;
     private Label redPercentLabel;
+    private boolean isReverse = false; // 翻转状态
 
     private static final double TOTAL_HEIGHT = 650.0; // 总高度
 
@@ -33,6 +34,16 @@ public class WinRateManager {
         // 初始化默认胜率为50%
         updateWinRate(50.0, 50.0);
     }
+    
+    /**
+     * 设置翻转状态
+     * @param isReverse 翻转状态
+     */
+    public void setReverse(boolean isReverse) {
+        this.isReverse = isReverse;
+        // 翻转后重新更新胜率显示
+        updateWinRate(50.0, 50.0);
+    }
 
     /**
      * 更新胜率显示
@@ -50,27 +61,56 @@ public class WinRateManager {
 
         // 确保在JavaFX应用线程上更新UI
         Platform.runLater(() -> {
-            // 更新黑方胜率柱
-            blackWinBar.setHeight(blackHeight);
-            if (blackWinRate > 0 || blackWinRate == 100) {
-                blackPercentLabel.setText(String.format("%.0f%%", blackWinRate));
-                // 黑方百分比显示到黑色柱中间
-                blackPercentLabel.setLayoutY(blackHeight / 2 - 10); // 10是标签高度的一半
-                blackPercentLabel.setVisible(true);
-            } else {
-                blackPercentLabel.setVisible(false);
-            }
+            if (isReverse) {
+                // 翻转状态：黑方在下，红方在上
+                // 更新红方胜率柱（上半部分）
+                redWinBar.setY(0);
+                redWinBar.setHeight(redHeight);
+                if (redWinRate > 0 || redWinRate == 100) {
+                    redPercentLabel.setText(String.format("%.0f%%", redWinRate));
+                    // 红方百分比显示到红色柱中间
+                    redPercentLabel.setLayoutY(redHeight / 2 - 10); // 10是标签高度的一半
+                    redPercentLabel.setVisible(true);
+                } else {
+                    redPercentLabel.setVisible(false);
+                }
 
-            // 更新红方胜率柱
-            redWinBar.setY(blackHeight);
-            redWinBar.setHeight(redHeight);
-            if (redWinRate > 0 || redWinRate == 100) {
-                redPercentLabel.setText(String.format("%.0f%%", redWinRate));
-                // 红方百分比显示到红色柱中间
-                redPercentLabel.setLayoutY(blackHeight + redHeight / 2 - 10); // 10是标签高度的一半
-                redPercentLabel.setVisible(true);
+                // 更新黑方胜率柱（下半部分）
+                blackWinBar.setY(redHeight);
+                blackWinBar.setHeight(blackHeight);
+                if (blackWinRate > 0 || blackWinRate == 100) {
+                    blackPercentLabel.setText(String.format("%.0f%%", blackWinRate));
+                    // 黑方百分比显示到黑色柱中间
+                    blackPercentLabel.setLayoutY(redHeight + blackHeight / 2 - 10); // 10是标签高度的一半
+                    blackPercentLabel.setVisible(true);
+                } else {
+                    blackPercentLabel.setVisible(false);
+                }
             } else {
-                redPercentLabel.setVisible(false);
+                // 正常状态：黑方在上，红方在下
+                // 更新黑方胜率柱（上半部分）
+                blackWinBar.setY(0);
+                blackWinBar.setHeight(blackHeight);
+                if (blackWinRate > 0 || blackWinRate == 100) {
+                    blackPercentLabel.setText(String.format("%.0f%%", blackWinRate));
+                    // 黑方百分比显示到黑色柱中间
+                    blackPercentLabel.setLayoutY(blackHeight / 2 - 10); // 10是标签高度的一半
+                    blackPercentLabel.setVisible(true);
+                } else {
+                    blackPercentLabel.setVisible(false);
+                }
+
+                // 更新红方胜率柱（下半部分）
+                redWinBar.setY(blackHeight);
+                redWinBar.setHeight(redHeight);
+                if (redWinRate > 0 || redWinRate == 100) {
+                    redPercentLabel.setText(String.format("%.0f%%", redWinRate));
+                    // 红方百分比显示到红色柱中间
+                    redPercentLabel.setLayoutY(blackHeight + redHeight / 2 - 10); // 10是标签高度的一半
+                    redPercentLabel.setVisible(true);
+                } else {
+                    redPercentLabel.setVisible(false);
+                }
             }
         });
     }
