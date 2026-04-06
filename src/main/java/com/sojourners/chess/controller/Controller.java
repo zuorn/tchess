@@ -650,9 +650,12 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
     }
 
     private double originalSplitPos = 0.6416122004357299; // 原始分割位置
+    private double originalStageWidth; // 原始窗口宽度
     
     @FXML
     private void toggleEnginePanelButtonClick(ActionEvent e) {
+        // 获取舞台（窗口）
+        javafx.stage.Stage stage = (javafx.stage.Stage) borderPane.getScene().getWindow();
         // 获取右侧面板的AnchorPane
         AnchorPane rightPane = (AnchorPane) splitPane.getItems().get(1);
         boolean isVisible = rightPane.isVisible();
@@ -664,15 +667,20 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
         if (isVisible) {
             // 当前是可见的，点击后隐藏右侧面板
             toggleEnginePanelButton.setStyle("-fx-background-image: url('/image/arrow-right.png');");
-            // 保存原始分割位置
+            // 保存原始分割位置和窗口宽度
             originalSplitPos = splitPane.getDividerPositions()[0];
+            originalStageWidth = stage.getWidth();
             // 设置分割位置为1.0，使左侧面板占满整个窗口
             splitPane.setDividerPosition(0, 1.0);
+            // 收缩窗口宽度（只保留棋盘部分）
+            stage.setWidth(650); // 调整为合适的宽度
         } else {
             // 当前是不可见的，点击后显示右侧面板
             toggleEnginePanelButton.setStyle("-fx-background-image: url('/image/arrow-left.png');");
             // 恢复原始分割位置
             splitPane.setDividerPosition(0, originalSplitPos);
+            // 恢复原始窗口宽度
+            stage.setWidth(originalStageWidth);
         }
         
         // 调整棋盘大小
@@ -1309,8 +1317,12 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
 
         graphLinker.stop();
 
-        prop.setStageWidth(borderPane.getWidth());
-        prop.setStageHeight(borderPane.getHeight());
+        // 获取舞台（窗口）
+        javafx.stage.Stage stage = (javafx.stage.Stage) borderPane.getScene().getWindow();
+        // 保存舞台大小
+        prop.setStageWidth(stage.getWidth());
+        prop.setStageHeight(stage.getHeight());
+        // 保存分割面板位置
         prop.setSplitPos(splitPane.getDividerPositions()[0]);
         prop.setSplitPos2(splitPane2.getDividerPositions()[0]);
 

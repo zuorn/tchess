@@ -81,7 +81,6 @@ public class Properties implements Serializable {
      * 显示棋谱管理
      */
     private boolean showChessNotation = false;
-
     private String chessManualPath;
 
     private boolean manualTip = true;
@@ -478,4 +477,4 @@ public class Properties implements Serializable {
     public void setManualTip(boolean manualTip) {
         this.manualTip = manualTip;
     }
-}
+    }

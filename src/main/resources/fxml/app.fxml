@@ -199,9 +199,9 @@
                             <AnchorPane fx:id="winRatePane" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" style="-fx-background-color: #F0F0F0;">
                                 <children>
                                     <!-- 黑方胜率柱（上半部分） -->
-                                    <Rectangle fx:id="blackWinBar" arcHeight="5.0" arcWidth="5.0" height="325.0" style="-fx-fill: #333333; -fx-stroke: #222222; -fx-stroke-width: 1px;" width="40.0" x="5.0" y="0.0" />
+                                    <Rectangle fx:id="blackWinBar" arcHeight="5.0" arcWidth="5.0" height="325.0" style="-fx-fill: #282828; -fx-stroke: #181818; -fx-stroke-width: 1px;" width="40.0" x="5.0" y="0.0" />
                                     <!-- 红方胜率柱（下半部分） -->
-                                    <Rectangle fx:id="redWinBar" arcHeight="5.0" arcWidth="5.0" height="325.0" style="-fx-fill: #C83C3C; -fx-stroke: #A82C2C; -fx-stroke-width: 1px;" width="40.0" x="5.0" y="325.0" />
+                                    <Rectangle fx:id="redWinBar" arcHeight="5.0" arcWidth="5.0" height="325.0" style="-fx-fill: #bd5242; -fx-stroke: #a84232; -fx-stroke-width: 1px;" width="40.0" x="5.0" y="325.0" />
                                     <!-- 黑方50%文字标注 -->
                                     <Label fx:id="blackPercentLabel" layoutX="10.0" layoutY="155.0" style="-fx-font-size: 14px; -fx-text-fill: white; -fx-font-weight: bold;" text="50%" />
                                     <!-- 红方50%文字标注 -->
