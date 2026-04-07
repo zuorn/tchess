@@ -13,6 +13,8 @@ public interface EngineCallBack {
 
     void bestMove(String first, String second);
 
+    void bestMove(String first, String second, Integer score, double winRate);
+
     void thinkDetail(ThinkData td);
 
     void showBookResults(List<BookData> list);

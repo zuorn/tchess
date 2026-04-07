@@ -292,17 +292,22 @@ public class Engine {
                 List<BookData> results = OpenBookManager.getInstance().queryBook(board, redGo, moves.size() / 2 >= Properties.getInstance().getOffManualSteps());
                 System.out.println("查询库时间" + (System.currentTimeMillis() - s));
                 this.cb.showBookResults(results);
+                // 无论是否使用库招，都先进行分析
+                this.analysis(fenCode, moves, null);
+                // 分析完成后，如果有库招结果，使用库招走法
                 if (results.size() > 0 && this.analysisModel != AnalysisModel.INFINITE) {
                     if (Properties.getInstance().getBookDelayEnd() > 0 && Properties.getInstance().getBookDelayEnd() >= Properties.getInstance().getBookDelayStart()) {
                         int t = random.nextInt(Properties.getInstance().getBookDelayStart(), Properties.getInstance().getBookDelayEnd());
                         sleep(t);
                     }
-                    this.cb.bestMove(results.get(0).getMove(), null);
+                    // 将库招的分数信息传递给 bestMove 方法
+                    BookData bestBookData = results.get(0);
+                    this.cb.bestMove(bestBookData.getMove(), null, bestBookData.getScore(), bestBookData.getWinRate());
                     return;
                 }
-
+            } else {
+                this.analysis(fenCode, moves, null);
             }
-            this.analysis(fenCode, moves, null);
         });
     }
 

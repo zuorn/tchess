@@ -450,7 +450,8 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
 
         engine.setThreadNum(prop.getThreadNum());
         engine.setHashSize(prop.getHashSize());
-        engine.setAnalysisModel(robotAnalysis.getValue() ? Engine.AnalysisModel.INFINITE : prop.getAnalysisModel(), prop.getAnalysisValue());
+        // 无论是否为分析模式，都使用相同的分析参数，确保自动下棋时也能返回详细的分析结果
+        engine.setAnalysisModel(prop.getAnalysisModel(), prop.getAnalysisValue());
         engine.analysis(chessManualHandle.getFenCode(), chessManualHandle.getMoveList(), this.board.getBoard(), redGo);
     }
 
@@ -1236,6 +1237,39 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
             Platform.runLater(() -> {
                 board.move(s.getStart().getX(), s.getStart().getY(), s.getEnd().getX(), s.getEnd().getY());
                 board.setTip(second, null, 1);
+
+                goCallBack(first);
+            });
+
+            if (linkMode.getValue()) {
+                trickAutoClick(s);
+            }
+        }
+    }
+
+    @Override
+    public void bestMove(String first, String second, Integer score, double winRate) {
+        if (redGo && robotRed.getValue() || !redGo && robotBlack.getValue()) {
+            ChessBoard.Step s = board.stepForBoard(first);
+
+            Platform.runLater(() -> {
+                board.move(s.getStart().getX(), s.getStart().getY(), s.getEnd().getX(), s.getEnd().getY());
+                board.setTip(second, null, 1);
+
+                // 设置分数
+                if (score != null) {
+                    chessManualHandle.setScore(score, null);
+                    // 更新胜率显示
+                    double[] winRates = WinRateManager.getInstance().calculateWinRate(score);
+                    WinRateManager.getInstance().updateWinRate(winRates[0], winRates[1]);
+                } else if (winRate > 0) {
+                    // 胜率值转换为分数，用于计算胜率显示
+                    int scoreValue = (int) ((winRate - 0.5) * 2000);
+                    chessManualHandle.setScore(scoreValue, null);
+                    // 更新胜率显示
+                    double[] winRates = WinRateManager.getInstance().calculateWinRate(scoreValue);
+                    WinRateManager.getInstance().updateWinRate(winRates[0], winRates[1]);
+                }
 
                 goCallBack(first);
             });
