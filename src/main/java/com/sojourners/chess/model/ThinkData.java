@@ -23,6 +23,8 @@ public class ThinkData {
 
     private List<String> detail;
 
+    private int[] wdl; // WDL 数据，分别是胜、和、负的次数
+
     private String title;
 
     private String body;
@@ -142,5 +144,13 @@ public class ThinkData {
 
     public void setPv(Integer pv) {
         this.pv = pv;
+    }
+
+    public int[] getWdl() {
+        return wdl;
+    }
+
+    public void setWdl(int[] wdl) {
+        this.wdl = wdl;
     }
 }

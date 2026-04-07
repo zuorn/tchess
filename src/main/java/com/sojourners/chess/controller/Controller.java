@@ -1259,17 +1259,9 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
                 // 设置分数
                 if (score != null) {
                     chessManualHandle.setScore(score, null);
-                    // 更新胜率显示
-                    double[] winRates = WinRateManager.getInstance().calculateWinRate(score);
-                    WinRateManager.getInstance().updateWinRate(winRates[0], winRates[1]);
-                } else if (winRate > 0) {
-                    // 胜率值转换为分数，用于计算胜率显示
-                    int scoreValue = (int) ((winRate - 0.5) * 2000);
-                    chessManualHandle.setScore(scoreValue, null);
-                    // 更新胜率显示
-                    double[] winRates = WinRateManager.getInstance().calculateWinRate(scoreValue);
-                    WinRateManager.getInstance().updateWinRate(winRates[0], winRates[1]);
+                    // 注意：这里不再使用分数模拟 WDL 数据，只使用引擎返回的 WDL 数据
                 }
+                // 胜率更新由 thinkDetail 方法处理，它会使用引擎返回的 WDL 数据
 
                 goCallBack(first);
             });
@@ -1304,8 +1296,13 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
                     }
                     
                     // 更新胜率显示
-                    if (td.getScore() != null) {
-                        double[] winRates = WinRateManager.getInstance().calculateWinRate(td.getScore());
+                    if (td.getWdl() != null) {
+                        // 使用引擎返回的 WDL 数据计算胜率
+                        int[] wdl = td.getWdl();
+                        int winNum = wdl[0];
+                        int drawNum = wdl[1];
+                        int loseNum = wdl[2];
+                        double[] winRates = WinRateManager.getInstance().calculateWinRateFromWDL(winNum, drawNum, loseNum, redGo);
                         WinRateManager.getInstance().updateWinRate(winRates[0], winRates[1]);
                     }
                 });
@@ -1325,10 +1322,13 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
         // 更新胜率显示
         if (list != null && !list.isEmpty()) {
             BookData bestBookData = list.get(0);
-            double winRate = bestBookData.getWinRate();
-            // 胜率值转换为分数，用于计算胜率显示
-            int score = (int) ((winRate - 0.5) * 2000);
-            double[] winRates = WinRateManager.getInstance().calculateWinRate(score);
+            // 使用 WDL 数据计算胜率
+            double[] winRates = WinRateManager.getInstance().calculateWinRateFromWDL(
+                    bestBookData.getWinNum(),
+                    bestBookData.getDrawNum(),
+                    bestBookData.getLoseNum(),
+                    redGo
+            );
             WinRateManager.getInstance().updateWinRate(winRates[0], winRates[1]);
         }
     }

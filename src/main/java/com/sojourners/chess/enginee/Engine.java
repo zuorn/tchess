@@ -222,6 +222,17 @@ public class Engine {
             if (flag != 0) {
                 if (flag == 6) {
                     detail.add(str[i]);
+                } else if (flag == 8) {
+                    // 解析 WDL 数据
+                    if (i + 2 < str.length && StringUtils.isDigit(str[i]) && StringUtils.isDigit(str[i + 1]) && StringUtils.isDigit(str[i + 2])) {
+                        int[] wdl = new int[3];
+                        wdl[0] = Integer.parseInt(str[i]); // 胜
+                        wdl[1] = Integer.parseInt(str[i + 1]); // 和
+                        wdl[2] = Integer.parseInt(str[i + 2]); // 负
+                        td.setWdl(wdl);
+                        i += 2; // 跳过后面两个数字
+                    }
+                    flag = 0;
                 } else {
                     if (StringUtils.isDigit(str[i])) {
                         if (flag == 1) {
@@ -262,6 +273,8 @@ public class Engine {
                     flag = 1;
                 } else if ("time".equals(str[i])) {
                     flag = 2;
+                } else if ("wdl".equals(str[i])) {
+                    flag = 8; // 解析 WDL 数据
                 } else if ("pv".equals(str[i])) {
                     flag = 6;
                 } else if ("multipv".equals(str[i])) {

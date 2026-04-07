@@ -116,30 +116,40 @@ public class WinRateManager {
     }
 
     /**
-     * 根据引擎分数计算胜率
-     * @param score 引擎评估分数
+     * 根据 WDL 数据计算胜率
+     * @param winNum 胜利次数
+     * @param drawNum 和棋次数
+     * @param loseNum 失败次数
+     * @param isRedTurn 是否红方回合
      * @return 黑方胜率和红方胜率的数组 [blackWinRate, redWinRate]
      */
-    public double[] calculateWinRate(int score) {
+    public double[] calculateWinRateFromWDL(int winNum, int drawNum, int loseNum, boolean isRedTurn) {
         double[] winRates = new double[2];
+        int totalGames = winNum + drawNum + loseNum;
 
-        // 简单的胜率计算逻辑，基于分数
-        // 分数为正，红方优势；分数为负，黑方优势
-        double ratio;
-        if (score > 0) {
-            // 红方优势
-            ratio = Math.min(score / 1000.0, 1.0);
-            winRates[1] = 50 + ratio * 50; // 红方胜率
-            winRates[0] = 100 - winRates[1]; // 黑方胜率
-        } else if (score < 0) {
-            // 黑方优势
-            ratio = Math.min(Math.abs(score) / 1000.0, 1.0);
-            winRates[0] = 50 + ratio * 50; // 黑方胜率
-            winRates[1] = 100 - winRates[0]; // 红方胜率
-        } else {
-            // 平局
+        if (totalGames == 0) {
+            // 如果没有数据，返回平局
             winRates[0] = 50.0;
             winRates[1] = 50.0;
+        } else {
+            // 计算综合胜率：W + D / 2
+            double winRate = (double) winNum / totalGames * 100;
+            double drawRate = (double) drawNum / totalGames * 100;
+            double loseRate = (double) loseNum / totalGames * 100;
+            
+            double redWinRate, blackWinRate;
+            if (isRedTurn) {
+                // 红方回合：红方的综合胜率是 W + D/2，黑方的综合胜率是 L + D/2
+                redWinRate = winRate + drawRate / 2;
+                blackWinRate = loseRate + drawRate / 2;
+            } else {
+                // 黑方回合：黑方的综合胜率是 W + D/2，红方的综合胜率是 L + D/2
+                blackWinRate = winRate + drawRate / 2;
+                redWinRate = loseRate + drawRate / 2;
+            }
+            
+            winRates[0] = blackWinRate;
+            winRates[1] = redWinRate;
         }
 
         return winRates;
