@@ -66,7 +66,7 @@ public class WinRateManager {
                 // 更新红方胜率柱（上半部分）
                 redWinBar.setY(0);
                 redWinBar.setHeight(redHeight);
-                if (redWinRate > 0 || redWinRate == 100) {
+                if (redWinRate >= 10 || redWinRate == 100) {
                     redPercentLabel.setText(String.format("%.0f%%", redWinRate));
                     // 红方百分比显示到红色柱中间
                     redPercentLabel.setLayoutY(redHeight / 2 - 10); // 10是标签高度的一半
@@ -78,7 +78,7 @@ public class WinRateManager {
                 // 更新黑方胜率柱（下半部分）
                 blackWinBar.setY(redHeight);
                 blackWinBar.setHeight(blackHeight);
-                if (blackWinRate > 0 || blackWinRate == 100) {
+                if (blackWinRate >= 10 || blackWinRate == 100) {
                     blackPercentLabel.setText(String.format("%.0f%%", blackWinRate));
                     // 黑方百分比显示到黑色柱中间
                     blackPercentLabel.setLayoutY(redHeight + blackHeight / 2 - 10); // 10是标签高度的一半
@@ -91,7 +91,7 @@ public class WinRateManager {
                 // 更新黑方胜率柱（上半部分）
                 blackWinBar.setY(0);
                 blackWinBar.setHeight(blackHeight);
-                if (blackWinRate > 0 || blackWinRate == 100) {
+                if (blackWinRate >= 10 || blackWinRate == 100) {
                     blackPercentLabel.setText(String.format("%.0f%%", blackWinRate));
                     // 黑方百分比显示到黑色柱中间
                     blackPercentLabel.setLayoutY(blackHeight / 2 - 10); // 10是标签高度的一半
@@ -103,7 +103,7 @@ public class WinRateManager {
                 // 更新红方胜率柱（下半部分）
                 redWinBar.setY(blackHeight);
                 redWinBar.setHeight(redHeight);
-                if (redWinRate > 0 || redWinRate == 100) {
+                if (redWinRate >= 10 || redWinRate == 100) {
                     redPercentLabel.setText(String.format("%.0f%%", redWinRate));
                     // 红方百分比显示到红色柱中间
                     redPercentLabel.setLayoutY(blackHeight + redHeight / 2 - 10); // 10是标签高度的一半
