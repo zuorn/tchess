@@ -511,8 +511,24 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
                 oldList.remove(j);
             }
         } else if (i < newList.size()) {
-            oldList.addAll(newList.subList(i, newList.size()));
+            List<XYChart.Data> newDataList = newList.subList(i, newList.size());
+            oldList.addAll(newDataList);
         }
+        
+        // 为所有数据点设置颜色
+        Platform.runLater(() -> {
+            for (int j = 0; j < oldList.size(); j++) {
+                XYChart.Data data = oldList.get(j);
+                if (data.getNode() != null) {
+                    // 根据步数判断颜色：红方走的棋（奇数步）显示红色，黑方走的棋（偶数步）显示黑色
+                    if (j % 2 == 1) {
+                        data.getNode().setStyle("-fx-background-color: #bd5242; -fx-background-radius: 4; -fx-padding: 4px;");
+                    } else {
+                        data.getNode().setStyle("-fx-background-color: #282828; -fx-background-radius: 4; -fx-padding: 4px;");
+                    }
+                }
+            }
+        });
         
         // 动态更新 Y 轴范围
         if (lineChart != null && !oldList.isEmpty()) {
@@ -717,7 +733,7 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
         this.lineChart = new LineChart<>(xAxis, yAxis);
         this.lineChart.setMinHeight(100);
         this.lineChart.setLegendVisible(false);
-        this.lineChart.setCreateSymbols(false);
+        this.lineChart.setCreateSymbols(true); // 启用数据点显示
         this.lineChart.setVerticalGridLinesVisible(false);
         this.lineChart.getStylesheets().add(this.getClass().getResource("/style/table.css").toString());
 

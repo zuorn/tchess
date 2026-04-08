@@ -133,9 +133,9 @@ public class WinRateManager {
 
     /**
      * 根据 WDL 数据计算胜率
-     * @param winNum 胜利次数
-     * @param drawNum 和棋次数
-     * @param loseNum 失败次数
+     * @param winNum 胜利值
+     * @param drawNum 和棋值
+     * @param loseNum 失败值
      * @param isRedTurn 是否红方回合
      * @return 黑方胜率和红方胜率的数组 [blackWinRate, redWinRate]
      */
