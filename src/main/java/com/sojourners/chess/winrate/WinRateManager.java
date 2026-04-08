@@ -67,7 +67,11 @@ public class WinRateManager {
                 redWinBar.setY(0);
                 redWinBar.setHeight(redHeight);
                 if (redWinRate >= 10 || redWinRate == 100) {
-                    redPercentLabel.setText(String.format("%.0f%%", redWinRate));
+                    if (redWinRate == 100) {
+                        redPercentLabel.setText("必胜");
+                    } else {
+                        redPercentLabel.setText(String.format("%.0f%%", redWinRate));
+                    }
                     // 红方百分比显示到红色柱中间
                     redPercentLabel.setLayoutY(redHeight / 2 - 10); // 10是标签高度的一半
                     redPercentLabel.setVisible(true);
@@ -79,7 +83,11 @@ public class WinRateManager {
                 blackWinBar.setY(redHeight);
                 blackWinBar.setHeight(blackHeight);
                 if (blackWinRate >= 10 || blackWinRate == 100) {
-                    blackPercentLabel.setText(String.format("%.0f%%", blackWinRate));
+                    if (blackWinRate == 100) {
+                        blackPercentLabel.setText("必胜");
+                    } else {
+                        blackPercentLabel.setText(String.format("%.0f%%", blackWinRate));
+                    }
                     // 黑方百分比显示到黑色柱中间
                     blackPercentLabel.setLayoutY(redHeight + blackHeight / 2 - 10); // 10是标签高度的一半
                     blackPercentLabel.setVisible(true);
@@ -92,7 +100,11 @@ public class WinRateManager {
                 blackWinBar.setY(0);
                 blackWinBar.setHeight(blackHeight);
                 if (blackWinRate >= 10 || blackWinRate == 100) {
-                    blackPercentLabel.setText(String.format("%.0f%%", blackWinRate));
+                    if (blackWinRate == 100) {
+                        blackPercentLabel.setText("必胜");
+                    } else {
+                        blackPercentLabel.setText(String.format("%.0f%%", blackWinRate));
+                    }
                     // 黑方百分比显示到黑色柱中间
                     blackPercentLabel.setLayoutY(blackHeight / 2 - 10); // 10是标签高度的一半
                     blackPercentLabel.setVisible(true);
@@ -104,7 +116,11 @@ public class WinRateManager {
                 redWinBar.setY(blackHeight);
                 redWinBar.setHeight(redHeight);
                 if (redWinRate >= 10 || redWinRate == 100) {
-                    redPercentLabel.setText(String.format("%.0f%%", redWinRate));
+                    if (redWinRate == 100) {
+                        redPercentLabel.setText("必胜");
+                    } else {
+                        redPercentLabel.setText(String.format("%.0f%%", redWinRate));
+                    }
                     // 红方百分比显示到红色柱中间
                     redPercentLabel.setLayoutY(blackHeight + redHeight / 2 - 10); // 10是标签高度的一半
                     redPercentLabel.setVisible(true);

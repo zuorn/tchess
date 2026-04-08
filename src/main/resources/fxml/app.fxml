@@ -11,11 +11,11 @@
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
-          <Menu mnemonicParsing="false" text="文件">
-            <items>
-              <MenuItem mnemonicParsing="false" onAction="#exit" text="退出" />
-            </items>
-          </Menu>
+<!--          <Menu mnemonicParsing="false" text="文件">-->
+<!--            <items>-->
+<!--              <MenuItem mnemonicParsing="false" onAction="#exit" text="退出" />-->
+<!--            </items>-->
+<!--          </Menu>-->
             <Menu mnemonicParsing="false" text="局面">
                <items>
                   <MenuItem mnemonicParsing="false" onAction="#newButtonClick" text="新局面" />
