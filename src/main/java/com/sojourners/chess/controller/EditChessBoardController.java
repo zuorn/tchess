@@ -10,6 +10,7 @@ import com.sojourners.chess.util.DialogUtils;
 import com.sojourners.chess.util.XiangqiUtils;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Label;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -21,6 +22,8 @@ public class EditChessBoardController {
     private Canvas canvas;
     @FXML
     private Canvas demoCanvas;
+    @FXML
+    private Label firstMoveLabel;
 
     private char[][] board;
     private char[][] demoBoard;
@@ -31,10 +34,7 @@ public class EditChessBoardController {
     private ChessBoard.Point remark;
     private ChessBoard.Point demoRemark;
 
-    @FXML
-    private RadioButton blackFirstButton;
-    @FXML
-    private RadioButton redFirstButton;
+
 
     private ChessBoard.BoardSize boardSize;
 
@@ -150,7 +150,7 @@ public class EditChessBoardController {
         if (!XiangqiUtils.validateChessBoard(board) && !DialogUtils.showConfirmDialog("提示", "检测到局面不合法，可能会导致引擎退出或者崩溃，是否继续？")) {
             return;
         }
-        fenCode = ChessBoard.fenCode(board, redFirstButton.isSelected());
+        fenCode = ChessBoard.fenCode(board, firstMoveLabel.getText().equals("红方\n先行"));
         App.closeEditChessBoard();
     }
 
@@ -163,9 +163,22 @@ public class EditChessBoardController {
 
     public void setFirstMover(boolean redFirst) {
         if (redFirst) {
-            redFirstButton.setSelected(true);
+            firstMoveLabel.setText("红方\n先行");
+            firstMoveLabel.setStyle("-fx-background-color: #bd5242; -fx-text-fill: white; -fx-font-size: 45px; -fx-font-weight: bold; -fx-padding: 10px; -fx-alignment: CENTER; -fx-background-radius: 5px;");
         } else {
-            blackFirstButton.setSelected(true);
+            firstMoveLabel.setText("黑方\n优先");
+            firstMoveLabel.setStyle("-fx-background-color: #282828; -fx-text-fill: white; -fx-font-size: 45px; -fx-font-weight: bold; -fx-padding: 10px; -fx-alignment: CENTER; -fx-background-radius: 5px;");
+        }
+    }
+    
+    @FXML
+    void toggleFirstMove(MouseEvent event) {
+        if (firstMoveLabel.getText().equals("红方\n先行")) {
+            firstMoveLabel.setText("黑方\n优先");
+            firstMoveLabel.setStyle("-fx-background-color: #282828; -fx-text-fill: white; -fx-font-size: 45px; -fx-font-weight: bold; -fx-padding: 10px; -fx-alignment: CENTER; -fx-background-radius: 5px;");
+        } else {
+            firstMoveLabel.setText("红方\n先行");
+            firstMoveLabel.setStyle("-fx-background-color: #bd5242; -fx-text-fill: white; -fx-font-size: 45px; -fx-font-weight: bold; -fx-padding: 10px; -fx-alignment: CENTER; -fx-background-radius: 5px;");
         }
     }
 
@@ -195,9 +208,9 @@ public class EditChessBoardController {
         this.boardRender = Properties.getInstance().getBoardStyle() == ChessBoard.BoardStyle.CUSTOM ? new CustomBoardRender(canvas) : new DefaultBoardRender(canvas);
         this.demoBoardRender = Properties.getInstance().getBoardStyle() == ChessBoard.BoardStyle.CUSTOM ? new CustomBoardRender(demoCanvas) : new DefaultBoardRender(demoCanvas);
         this.boardSize = ChessBoard.BoardSize.MIDDLE_BOARD;
-
-        ToggleGroup group = new ToggleGroup();
-        redFirstButton.setToggleGroup(group);
-        blackFirstButton.setToggleGroup(group);
+        
+        // 初始化先行方为红方
+        firstMoveLabel.setText("红方\n先行");
+        firstMoveLabel.setStyle("-fx-background-color: #bd5242; -fx-text-fill: white; -fx-font-size: 45px; -fx-font-weight: bold; -fx-padding: 10px; -fx-alignment: CENTER; -fx-background-radius: 5px;");
     }
 }

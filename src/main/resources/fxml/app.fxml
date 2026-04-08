@@ -120,6 +120,11 @@
                         <Insets />
                      </opaqueInsets>
                   </Button>
+                  <Button fx:id="editChessBoardButton" contentDisplay="GRAPHIC_ONLY" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#editChessBoardClick" style="-fx-background-image: url('/image/edit.png');" stylesheets="@../style/app.css" text="Button">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Button>
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
                   <Button fx:id="openManualButton" contentDisplay="GRAPHIC_ONLY" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#openChessManualFile" style="-fx-background-image: url('/image/open.png');" stylesheets="@../style/app.css" text="Button">
                      <opaqueInsets>
