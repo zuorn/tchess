@@ -352,11 +352,11 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
             }
             engine.setThreadNum(prop.getThreadNum());
             engine.setHashSize(prop.getHashSize());
-
             // 无论是否为分析模式，都使用相同的分析参数，确保自动下棋时也能返回详细的分析结果
 //            engine.setAnalysisModel(prop.getAnalysisModel(), prop.getAnalysisValue());
 
-            engine.setAnalysisModel(robotAnalysis.getValue() ? Engine.AnalysisModel.INFINITE : prop.getAnalysisModel(), prop.getAnalysisValue())
+            engine.setAnalysisModel(robotAnalysis.getValue() ? Engine.AnalysisModel.INFINITE : prop.getAnalysisModel(), prop.getAnalysisValue());
+
             engine.analysis(chessManualHandle.getFenCode(), chessManualHandle.getMoveList(), tacticList);
         }
     }
@@ -453,11 +453,9 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
         tacticList = null;
 
         engine.setThreadNum(prop.getThreadNum());
-
         engine.setHashSize(prop.getHashSize());
-
-        engine.setAnalysisModel(robotAnalysis.getValue() ? Engine.AnalysisModel.INFINITE : prop.getAnalysisModel(), prop.getAnalysisValue());
-
+        // 无论是否为分析模式，都使用相同的分析参数，确保自动下棋时也能返回详细的分析结果
+        engine.setAnalysisModel(prop.getAnalysisModel(), prop.getAnalysisValue());
         engine.analysis(chessManualHandle.getFenCode(), chessManualHandle.getMoveList(), this.board.getBoard(), redGo);
     }
 
