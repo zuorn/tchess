@@ -12,6 +12,10 @@ import com.sojourners.chess.util.StringUtils;
 import java.io.*;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -49,6 +53,16 @@ public class Engine {
     private Random random;
 
     private int multiPV;
+
+    /**
+     * 库招路径：引擎照常分析以获取 thinkDetail/WDL，但不把引擎的 bestmove 交给界面（改由库招落子）。
+     */
+    private volatile boolean suppressEngineBestMove;
+    private volatile CompletableFuture<Void> bookAnalysisDone;
+    /**
+     * 超时强制结束库招等待后，丢弃随后可能迟到的一行引擎 bestmove，避免二次记谱。
+     */
+    private volatile boolean dropNextEngineBestMove;
 
     public enum AnalysisModel {
         FIXED_TIME,
@@ -109,6 +123,22 @@ public class Engine {
             Thread.sleep(t);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private long bookAnalysisWaitTimeoutMs() {
+        if (analysisModel == AnalysisModel.FIXED_TIME) {
+            return Math.max(5000L, analysisValue + 20_000L);
+        }
+        return 180_000L;
+    }
+
+    private void completeBookAnalysisWait() {
+        CompletableFuture<Void> d = bookAnalysisDone;
+        bookAnalysisDone = null;
+        suppressEngineBestMove = false;
+        if (d != null && !d.isDone()) {
+            d.complete(null);
         }
     }
 
@@ -199,11 +229,25 @@ public class Engine {
     private void bestMove(String msg) {
         if (stopFlag) {
             stopFlag = false;
+            if (suppressEngineBestMove) {
+                completeBookAnalysisWait();
+            }
+            return;
+        }
+        if (dropNextEngineBestMove) {
+            dropNextEngineBestMove = false;
             return;
         }
 
         String[] str = msg.split(" ");
         if (str.length < 2 || !validateMove(str[1])) {
+            if (suppressEngineBestMove) {
+                completeBookAnalysisWait();
+            }
+            return;
+        }
+        if (suppressEngineBestMove) {
+            completeBookAnalysisWait();
             return;
         }
         if (Properties.getInstance().getEngineDelayEnd() > 0 && Properties.getInstance().getEngineDelayEnd() >= Properties.getInstance().getEngineDelayStart()) {
@@ -305,19 +349,61 @@ public class Engine {
                 List<BookData> results = OpenBookManager.getInstance().queryBook(board, redGo, moves.size() / 2 >= Properties.getInstance().getOffManualSteps());
                 System.out.println("查询库时间" + (System.currentTimeMillis() - s));
                 this.cb.showBookResults(results);
-                // 无论是否使用库招，都先进行分析
-                this.analysis(fenCode, moves, null);
-                // 分析完成后，如果有库招结果，使用库招走法
-                if (results.size() > 0 && this.analysisModel != AnalysisModel.INFINITE) {
+                boolean useBookAfterEngine = results.size() > 0 && this.analysisModel != AnalysisModel.INFINITE;
+                if (useBookAfterEngine) {
+                    CompletableFuture<Void> done = new CompletableFuture<>();
+                    this.bookAnalysisDone = done;
+                    this.suppressEngineBestMove = true;
+                    try {
+                        this.analysis(fenCode, moves, null);
+                        done.get(bookAnalysisWaitTimeoutMs(), TimeUnit.MILLISECONDS);
+                    } catch (TimeoutException e) {
+                        stop();
+                        try {
+                            done.get(10, TimeUnit.SECONDS);
+                        } catch (TimeoutException | ExecutionException e2) {
+                            completeBookAnalysisWait();
+                            dropNextEngineBestMove = true;
+                        } catch (InterruptedException e2) {
+                            Thread.currentThread().interrupt();
+                            completeBookAnalysisWait();
+                            dropNextEngineBestMove = true;
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        stop();
+                        try {
+                            done.get(10, TimeUnit.SECONDS);
+                        } catch (TimeoutException | ExecutionException e2) {
+                            completeBookAnalysisWait();
+                            dropNextEngineBestMove = true;
+                        } catch (InterruptedException e2) {
+                            Thread.currentThread().interrupt();
+                            completeBookAnalysisWait();
+                            dropNextEngineBestMove = true;
+                        }
+                    } catch (ExecutionException e) {
+                        stop();
+                        try {
+                            done.get(10, TimeUnit.SECONDS);
+                        } catch (TimeoutException | ExecutionException e2) {
+                            completeBookAnalysisWait();
+                            dropNextEngineBestMove = true;
+                        } catch (InterruptedException e2) {
+                            Thread.currentThread().interrupt();
+                            completeBookAnalysisWait();
+                            dropNextEngineBestMove = true;
+                        }
+                    }
                     if (Properties.getInstance().getBookDelayEnd() > 0 && Properties.getInstance().getBookDelayEnd() >= Properties.getInstance().getBookDelayStart()) {
                         int t = random.nextInt(Properties.getInstance().getBookDelayStart(), Properties.getInstance().getBookDelayEnd());
                         sleep(t);
                     }
-                    // 将库招的分数信息传递给 bestMove 方法
                     BookData bestBookData = results.get(0);
                     this.cb.bestMove(bestBookData.getMove(), null, bestBookData.getScore(), bestBookData.getWinRate());
                     return;
                 }
+                this.analysis(fenCode, moves, null);
             } else {
                 this.analysis(fenCode, moves, null);
             }
