@@ -19,7 +19,7 @@ import javafx.stage.WindowEvent;
  */
 public class App extends Application {
 
-    public static final String VERSION = "1.8";
+    public static final String VERSION = " 野生版";
     public static final String BUILT_ON = "20260301";
 
     private static Stage engineAdd;

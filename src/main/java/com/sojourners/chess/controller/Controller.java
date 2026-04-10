@@ -480,6 +480,10 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
         board.setManualList(nextList);
         // 趋势图
         refreshLineChart();
+        // 触发引擎分析以获取对方走棋的分数
+        if (robotRed.getValue() || robotBlack.getValue() || robotAnalysis.getValue()) {
+            engineGo();
+        }
         // 切换行棋方
         redGo = !redGo;
         // 触发引擎走棋
@@ -1290,10 +1294,12 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
 
     @Override
     public void thinkDetail(ThinkData td) {
-        if (redGo && robotRed.getValue() || !redGo && robotBlack.getValue() || robotAnalysis.getValue()) {
-            td.generate(redGo, isReverse.getValue(), board);
-            if (td.getValid()) {
-                Platform.runLater(() -> {
+        // 无论是否开启自动走棋或分析模式，都需要处理分析数据并设置分数
+        td.generate(redGo, isReverse.getValue(), board);
+        if (td.getValid()) {
+            Platform.runLater(() -> {
+                // 只有在开启自动走棋或分析模式时，才显示分析信息
+                if (redGo && robotRed.getValue() || !redGo && robotBlack.getValue() || robotAnalysis.getValue()) {
                     listView.getItems().addFirst(td);
                     if (listView.getItems().size() > 128) {
                         listView.getItems().removeLast();
@@ -1306,23 +1312,24 @@ public class Controller implements EngineCallBack, LinkerCallBack, ChessManualCa
                     }
 
                     board.setTip(td.getDetail().get(0), td.getDetail().size() > 1 ? td.getDetail().get(1) : null, td.getPv());
+                }
 
-                    if (td.getPv() == 1) {
-                        chessManualHandle.setScore(td.getScore(), td.getMate());
-                    }
-                    
-                    // 更新胜率显示
-                    if (td.getWdl() != null) {
-                        // 使用引擎返回的 WDL 数据计算胜率
-                        int[] wdl = td.getWdl();
-                        int winNum = wdl[0];
-                        int drawNum = wdl[1];
-                        int loseNum = wdl[2];
-                        double[] winRates = WinRateManager.getInstance().calculateWinRateFromWDL(winNum, drawNum, loseNum, redGo);
-                        WinRateManager.getInstance().updateWinRate(winRates[0], winRates[1]);
-                    }
-                });
-            }
+                // 无论是否开启自动走棋或分析模式，都需要设置分数
+                if (td.getPv() == 1) {
+                    chessManualHandle.setScore(td.getScore(), td.getMate());
+                }
+                
+                // 更新胜率显示
+                if (td.getWdl() != null) {
+                    // 使用引擎返回的 WDL 数据计算胜率
+                    int[] wdl = td.getWdl();
+                    int winNum = wdl[0];
+                    int drawNum = wdl[1];
+                    int loseNum = wdl[2];
+                    double[] winRates = WinRateManager.getInstance().calculateWinRateFromWDL(winNum, drawNum, loseNum, redGo);
+                    WinRateManager.getInstance().updateWinRate(winRates[0], winRates[1]);
+                }
+            });
         }
     }
 
