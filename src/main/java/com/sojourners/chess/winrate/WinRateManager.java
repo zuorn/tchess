@@ -12,6 +12,8 @@ public class WinRateManager {
     private Label blackPercentLabel;
     private Label redPercentLabel;
     private boolean isReverse = false; // 翻转状态
+    private double lastBlackWinRate = 50.0; // 上一次的黑方胜率
+    private double lastRedWinRate = 50.0; // 上一次的红方胜率
 
     private static final double TOTAL_HEIGHT = 650.0; // 总高度
 
@@ -41,8 +43,8 @@ public class WinRateManager {
      */
     public void setReverse(boolean isReverse) {
         this.isReverse = isReverse;
-        // 翻转后重新更新胜率显示
-        updateWinRate(50.0, 50.0);
+        // 翻转后使用上一次的胜率显示，而不是重置为50% 50%
+        updateWinRate(lastBlackWinRate, lastRedWinRate);
     }
 
     /**
@@ -54,6 +56,10 @@ public class WinRateManager {
         if (blackWinBar == null || redWinBar == null || blackPercentLabel == null || redPercentLabel == null) {
             return;
         }
+
+        // 保存当前胜率，用于后续使用
+        this.lastBlackWinRate = blackWinRate;
+        this.lastRedWinRate = redWinRate;
 
         // 计算柱状图高度
         double blackHeight = (blackWinRate / 100.0) * TOTAL_HEIGHT;
@@ -144,9 +150,9 @@ public class WinRateManager {
         int totalGames = winNum + drawNum + loseNum;
 
         if (totalGames == 0) {
-            // 如果没有数据，返回平局
-            winRates[0] = 50.0;
-            winRates[1] = 50.0;
+            // 如果没有数据，返回上一次的胜率，而不是平局
+            winRates[0] = lastBlackWinRate;
+            winRates[1] = lastRedWinRate;
         } else {
             // 计算综合胜率：W + D / 2
             double winRate = (double) winNum / totalGames * 100;
