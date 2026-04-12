@@ -176,4 +176,12 @@ public class WinRateManager {
 
         return winRates;
     }
+    
+    /**
+     * 重置胜率为50:50
+     * 用于新建局面、连线断开或重新连线时
+     */
+    public void resetWinRate() {
+        updateWinRate(50.0, 50.0);
+    }
 }
